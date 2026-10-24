@@ -218,3 +218,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Raw data stays out of Git - link to kaggle instead
+*.csv
+data/
+.env
+
+# OS clutter
+.DS_Store
+Thumbs.db
