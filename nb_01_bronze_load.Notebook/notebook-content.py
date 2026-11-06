@@ -11,6 +11,24 @@
 
 # CELL ********************
 
+# MAGIC %%configure -f
+# MAGIC { 
+# MAGIC             "defaultLakehouse": {
+# MAGIC                 "name": 'lh_olist',
+# MAGIC                 "id": '0f7e660c-8270-45b9-8490-086eba9a7f9d',
+# MAGIC                 "workspaceId": '70d2278e-9339-4ad3-b727-8e1d0fbb35ca'
+# MAGIC             }
+# MAGIC }
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # Parameters
 source_folder = "Files/bronze/olist"
 run_date = ""
@@ -41,6 +59,15 @@ SOURCES = {
 
 # check logging details
 print(f"run_id={run_id} run_date={run_date} sources={len(SOURCES)}")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
 
 # define functions
 def load_bronze(name: str, file_stem: str) -> int:
@@ -80,6 +107,15 @@ def load_bronze(name: str, file_stem: str) -> int:
     # return data count inserted in table 
     return spark.table(table).count()
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # load each tables
 results, failures = [], []
 
@@ -102,6 +138,15 @@ for name, stem in SOURCES.items():
 
         print(f"FAIL    bronze_{name}: {str(e)[:200]}")
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # audit logging
 rows = ([(run_id, run_date, t, f, n, "succeeded") for t, f, n in results] +
         [(run_id, run_date, f"bronze_{name}", None, None, "failed") for name, _ in failures])
@@ -116,6 +161,15 @@ audit_df.write.format("delta").mode("append").saveAsTable("audit_row_counts")
 
 display(audit_df)
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # fail the run if any table fails
 if failures:
     for name, err in failures:
@@ -123,10 +177,35 @@ if failures:
 
     raise RuntimeError(f"Bronze load failed for: {', '.join(n for n, _ in failures)}")
 
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # if nothing failed, proceeed
 print(f"Bronze load complete: {len(results)} tables loaded.")
 
 display(spark.sql("SELECT * FROM bronze_orders LIMIT 5"))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# exit session
+import notebookutils
+import json
+
+# Send status of notebook
+notebookutils.notebook.exit("Success")
 
 # METADATA ********************
 
